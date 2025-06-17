@@ -6,10 +6,12 @@ import (
 	"github.com/spf13/viper"
 	"github.com/valyala/fasthttp"
 	"k8s-controller/pkg/logger"
+	"k8s-controller/pkg/middleware"
 )
 
 var (
 	serverPort int
+	debugMode bool
 )
 
 // serverCmd represents the server command
@@ -24,8 +26,8 @@ var serverCmd = &cobra.Command{
 		port := serverPort
 		logger.Info().Int("port", port).Msg("Server configuration")
 
-		// Set up handler
-		handler := func(ctx *fasthttp.RequestCtx) {
+		// Create base handler
+		baseHandler := func(ctx *fasthttp.RequestCtx) {
 			path := string(ctx.Path())
 
 			switch path {
@@ -39,13 +41,19 @@ var serverCmd = &cobra.Command{
 				ctx.SetStatusCode(404)
 				fmt.Fprintf(ctx, "Not found")
 			}
-
-			logger.Info().
-				Str("method", string(ctx.Method())).
-				Str("path", path).
-				Int("status", ctx.Response.StatusCode()).
-				Msg("HTTP request")
 		}
+		
+		// Set up logging options
+		loggingOptions := middleware.DefaultLoggingOptions()
+		// Enable header logging for development
+		if debugMode {
+			loggingOptions.LogHeaders = true
+			loggingOptions.LogRequestBody = true
+			logger.Info().Msg("Debug mode enabled: detailed request logging activated")
+		}
+		
+		// Wrap base handler with request logging middleware
+		handler := middleware.EnhancedRequestLogger(loggingOptions)(baseHandler)
 
 		// Start server
 		addr := fmt.Sprintf(":%d", port)
@@ -62,6 +70,7 @@ func init() {
 
 	// Add server-specific flags
 	serverCmd.Flags().IntVar(&serverPort, "port", 8080, "HTTP server port")
+	serverCmd.Flags().BoolVar(&debugMode, "debug", false, "Enable debug mode with detailed request logging")
 
 	// Bind flag to environment variable
 	viper.BindPFlag("server_port", serverCmd.Flags().Lookup("port"))
