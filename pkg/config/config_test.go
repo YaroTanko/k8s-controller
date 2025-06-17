@@ -30,9 +30,11 @@ func TestLoadConfig(t *testing.T) {
 	// Clean up
 	os.Unsetenv("K8S_CONTROLLER_LOG_LEVEL")
 	os.Unsetenv("K8S_CONTROLLER_NAMESPACE")
+	viper.Reset()
 }
 
 func TestLoadConfigDefaults(t *testing.T) {
+	viper.Reset()
 	// Load config with defaults
 	cfg, err := LoadConfig()
 	if err != nil {
