@@ -91,15 +91,19 @@ func TestEnhancedRequestLogger(t *testing.T) {
 			ln := fasthttputil.NewInmemoryListener()
 			defer ln.Close()
 			
+			// Create a channel to signal server readiness
+			ready := make(chan struct{})
+			
 			// Start server
 			go func() {
+				close(ready) // Signal readiness
 				if err := s.Serve(ln); err != nil {
 					t.Errorf("Unexpected error: %s", err)
 				}
 			}()
 			
-			// Wait a moment for server to start
-			time.Sleep(10 * time.Millisecond)
+			// Wait for server to signal readiness
+			<-ready
 			
 			// Create a client
 			c := &fasthttp.Client{
