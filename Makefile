@@ -51,7 +51,7 @@ fmt:
 # Lint code
 .PHONY: lint
 lint:
-	$(GOLINT) run
+	./scripts/ci-lint.sh
 
 # Run tests
 .PHONY: test
