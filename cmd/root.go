@@ -74,9 +74,18 @@ func init() {
 
 	// Bind flags to environment variables
 	// Use K8S_CONTROLLER_KUBECONFIG instead of --kubeconfig
-	viper.BindPFlag("kubeconfig", rootCmd.PersistentFlags().Lookup("kubeconfig"))
-	viper.BindPFlag("namespace", rootCmd.PersistentFlags().Lookup("namespace"))
-	viper.BindPFlag("log_level", rootCmd.PersistentFlags().Lookup("log-level"))
+	if err := viper.BindPFlag("kubeconfig", rootCmd.PersistentFlags().Lookup("kubeconfig")); err != nil {
+		fmt.Fprintf(os.Stderr, "Error binding kubeconfig flag: %v\n", err)
+		os.Exit(1)
+	}
+	if err := viper.BindPFlag("namespace", rootCmd.PersistentFlags().Lookup("namespace")); err != nil {
+		fmt.Fprintf(os.Stderr, "Error binding namespace flag: %v\n", err)
+		os.Exit(1)
+	}
+	if err := viper.BindPFlag("log_level", rootCmd.PersistentFlags().Lookup("log-level")); err != nil {
+		fmt.Fprintf(os.Stderr, "Error binding log-level flag: %v\n", err)
+		os.Exit(1)
+	}
 
 	// Configure Viper
 	viper.SetEnvPrefix("K8S_CONTROLLER")

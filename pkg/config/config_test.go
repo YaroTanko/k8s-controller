@@ -9,8 +9,12 @@ import (
 
 func TestLoadConfig(t *testing.T) {
 	// Test with environment variables
-	os.Setenv("K8S_CONTROLLER_LOG_LEVEL", "debug")
-	os.Setenv("K8S_CONTROLLER_NAMESPACE", "test-namespace")
+	if err := os.Setenv("K8S_CONTROLLER_LOG_LEVEL", "debug"); err != nil {
+		t.Fatalf("Failed to set environment variable: %v", err)
+	}
+	if err := os.Setenv("K8S_CONTROLLER_NAMESPACE", "test-namespace"); err != nil {
+		t.Fatalf("Failed to set environment variable: %v", err)
+	}
 	
 	// Load config
 	cfg, err := LoadConfig()
@@ -28,8 +32,12 @@ func TestLoadConfig(t *testing.T) {
 	}
 	
 	// Clean up
-	os.Unsetenv("K8S_CONTROLLER_LOG_LEVEL")
-	os.Unsetenv("K8S_CONTROLLER_NAMESPACE")
+	if err := os.Unsetenv("K8S_CONTROLLER_LOG_LEVEL"); err != nil {
+		t.Fatalf("Failed to unset environment variable: %v", err)
+	}
+	if err := os.Unsetenv("K8S_CONTROLLER_NAMESPACE"); err != nil {
+		t.Fatalf("Failed to unset environment variable: %v", err)
+	}
 }
 
 func TestLoadConfigDefaults(t *testing.T) {

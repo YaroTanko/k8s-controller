@@ -89,7 +89,11 @@ func TestEnhancedRequestLogger(t *testing.T) {
 			
 			// Create a test server with in-memory listener
 			ln := fasthttputil.NewInmemoryListener()
-			defer ln.Close()
+			defer func() {
+				if err := ln.Close(); err != nil {
+					t.Errorf("Error closing listener: %v", err)
+				}
+			}()
 			
 			// Start server
 			go func() {
