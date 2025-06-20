@@ -1,0 +1,15 @@
+# These owners will be the default owners for everything in the repo
+* @YaroTanko
+
+# Specific package owners
+/pkg/logger/ @YaroTanko
+/pkg/config/ @YaroTanko
+/pkg/middleware/ @YaroTanko
+/cmd/ @YaroTanko
+
+# CI/CD workflow owners
+/.github/workflows/ @YaroTanko
+
+# Documentation owners
+/docs/ @YaroTanko
+/*.md @YaroTanko
