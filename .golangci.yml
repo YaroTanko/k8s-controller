@@ -1,48 +1,14 @@
-run:
-  timeout: 5m
-  go: '1.21'
-  
-linters:
-  enable:
-    - errcheck
-    - gofmt
-    - goimports
-    - gosimple
-    - govet
-    - ineffassign
-    - misspell
-    - revive
-    - staticcheck
-    - typecheck
-    - unused
-  disable:
-    - exhaustruct
-    - godox
-    - lll
-    - gochecknoglobals
-    - gochecknoinits
+version: "2"
 
 linters-settings:
-  errcheck:
-    check-type-assertions: true
   govet:
     check-shadowing: true
-  revive:
-    rules:
-      - name: exported
-        severity: warning
-        disabled: false
+
+run:
+  timeout: 5m
 
 issues:
   exclude-rules:
-    # Exclude some linters from running on tests files.
     - path: _test\.go
       linters:
-        - dupl
         - errcheck
-        - funlen
-  max-same-issues: 50
-
-output:
-  format: colored-line-number
-  sort-results: true

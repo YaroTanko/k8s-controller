@@ -7,6 +7,7 @@ import (
 	"github.com/valyala/fasthttp"
 	"k8s-controller/pkg/logger"
 	"k8s-controller/pkg/middleware"
+	"os"
 )
 
 var (
@@ -33,13 +34,22 @@ var serverCmd = &cobra.Command{
 			switch path {
 			case "/":
 				ctx.SetContentType("text/plain")
-				fmt.Fprintf(ctx, "Welcome to the k8s-controller HTTP server!")
+				_, err := fmt.Fprintf(ctx, "Welcome to the k8s-controller HTTP server!")
+				if err != nil {
+					logger.Error().Err(err).Msg("Failed to write response")
+				}
 			case "/health":
 				ctx.SetContentType("application/json")
-				fmt.Fprintf(ctx, `{"status":"healthy"}`)
+				_, err := fmt.Fprintf(ctx, `{"status":"healthy"}`)
+				if err != nil {
+					logger.Error().Err(err).Msg("Failed to write health response")
+				}
 			default:
 				ctx.SetStatusCode(404)
-				fmt.Fprintf(ctx, "Not found")
+				_, err := fmt.Fprintf(ctx, "Not found")
+				if err != nil {
+					logger.Error().Err(err).Msg("Failed to write not found response")
+				}
 			}
 		}
 		
@@ -73,7 +83,10 @@ func init() {
 	serverCmd.Flags().BoolVar(&debugMode, "debug", false, "Enable debug mode with detailed request logging")
 
 	// Bind flag to environment variable
-	viper.BindPFlag("server_port", serverCmd.Flags().Lookup("port"))
+	if err := viper.BindPFlag("server_port", serverCmd.Flags().Lookup("port")); err != nil {
+		fmt.Fprintf(os.Stderr, "Error binding server_port flag: %v\n", err)
+		os.Exit(1)
+	}
 
 	// Set environment variable name
 	viper.SetDefault("server_port", 8080)
